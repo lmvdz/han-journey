@@ -1,0 +1,19 @@
+# Two-step CI: cheap checks on every pull request push; the full suite on merge-queue batches (queue/*).
+name: ci
+on:
+  pull_request:
+  push:
+    branches: ["queue/**"]
+jobs:
+  quick:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m py_compile calc.py test_calc.py
+  full:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pytest && pytest -q
